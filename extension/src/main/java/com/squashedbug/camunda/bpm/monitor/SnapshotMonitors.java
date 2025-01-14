@@ -2,11 +2,11 @@ package com.squashedbug.camunda.bpm.monitor;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 
+import lombok.RequiredArgsConstructor;
 import org.camunda.bpm.engine.ProcessEngine;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -19,13 +19,11 @@ import io.micrometer.core.instrument.MeterRegistry;
 @PropertySource("classpath:library.properties")
 @ConditionalOnProperty(value = "camunda.monitoring.snapshot.enabled", havingValue = "true", matchIfMissing = true)
 @EnableScheduling
+@RequiredArgsConstructor
 public class SnapshotMonitors {
 
-    @Autowired
-    ProcessEngine processEngine;
-
-    @Autowired
-    MeterRegistry meterRegistry;
+    private final ProcessEngine processEngine;
+    private final MeterRegistry meterRegistry;
 
     List<Monitor> monitors = new ArrayList<>();
 
@@ -39,7 +37,7 @@ public class SnapshotMonitors {
 
     @Scheduled(fixedDelayString = "${camunda.monitoring.snapshot.updateRate}")
     public void update() {
-        monitors.stream().forEach(monitor -> monitor.update());
+        monitors.forEach(Monitor::update);
     }
 
 }

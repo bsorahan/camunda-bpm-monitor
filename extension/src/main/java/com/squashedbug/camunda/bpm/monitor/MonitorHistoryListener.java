@@ -1,5 +1,6 @@
 package com.squashedbug.camunda.bpm.monitor;
 
+import lombok.RequiredArgsConstructor;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.history.event.HistoricProcessInstanceEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoricIncidentEventEntity;
@@ -14,17 +15,17 @@ import io.micrometer.core.instrument.Tags;
 @Component
 public class MonitorHistoryListener {
 
-    private TaggedCounter processInstancesStartedCounter;
-    private TaggedCounter processInstancesEndedCounter;
+    private final TaggedCounter processInstancesStartedCounter;
+    private final TaggedCounter processInstancesEndedCounter;
+
+    private final ProcessEngine processEngine;
+    private final TaggedCounter incidentsCreatedCounter;
+    private final TaggedCounter incidentsResolvedCounter;
+    private final TaggedCounter incidentsDeletedCounter;
 
     @Autowired
-    ProcessEngine processEngine;
-    private TaggedCounter incidentsCreatedCounter;
-    private TaggedCounter incidentsResolvedCounter;
-    private TaggedCounter incidentsDeletedCounter;
-
-    @Autowired
-    public MonitorHistoryListener(MeterRegistry meterRegistry) {
+    public MonitorHistoryListener(MeterRegistry meterRegistry, ProcessEngine processEngine) {
+        this.processEngine = processEngine;
         processInstancesStartedCounter = new TaggedCounter(Meters.PROCESS_INSTANCES_STARTED.getMeterName(),
                 meterRegistry);
         processInstancesEndedCounter = new TaggedCounter(Meters.PROCESS_INSTANCES_ENDED.getMeterName(), meterRegistry);

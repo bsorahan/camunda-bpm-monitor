@@ -21,8 +21,8 @@ import lombok.Getter;
 @Getter
 public abstract class Monitor {
 
-    private ProcessEngine processEngine;
-    private MeterRegistry meterRegistry;
+    private final ProcessEngine processEngine;
+    private final MeterRegistry meterRegistry;
 
     Map<String, MultiGauge> multiGaugeMap = new HashMap<>();
 
@@ -42,10 +42,9 @@ public abstract class Monitor {
     public void update() {
         Collection<MultiGaugeData> gaugesData = retrieveGaugesData();
 
-        multiGaugeMap.entrySet().stream()
-                .forEach(gaugeEntry -> gaugeEntry.getValue().register(
-                        gaugesData.stream().map(d -> getRow(gaugeEntry.getKey(), d)).collect(Collectors.toList()),
-                        true));
+        multiGaugeMap.forEach((key, value) -> value.register(
+                gaugesData.stream().map(d -> getRow(key, d)).collect(Collectors.toList()),
+                true));
     }
 
     private Row<MultiGaugeData> getRow(String gaugeName, MultiGaugeData d) {
@@ -72,7 +71,7 @@ public abstract class Monitor {
 
     @AllArgsConstructor
     @Getter
-    protected class MultiGaugeData {
+    protected static class MultiGaugeData {
         Map<String, Long> gaugesValues;
         Tags tags;
     }
